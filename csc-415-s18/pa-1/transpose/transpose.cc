@@ -15,65 +15,72 @@ void transpose(const int *A, unsigned int m, unsigned int n, int *AT) {
 
 void transpose_block(const int *A, unsigned int m, unsigned int n, unsigned int block_size, int *AT) {
 
-	boolean isMultiple;
+	// Note: was referencing http://csapp.cs.cmu.edu/2e/waside/waside-blocking.pdf for understanding of loop cache blocking
+	// PDF "Using Blocking to Increase Temporal Locality"
 
-  int remainder_M = m % block_size;
-  int remainder_N = n % block_size;
+	// Recall: m = row = i;
+	// Recall: n = column = j;
+	// Goal: If A is an m × n matrix then AT is an n × m matrix.
 
-  if (remainder_M == 0 || remainder_N == 0)
-	isMultiple = false;
+	// if the size of the array is not equal we cannot transpose it correctly
+	if (m != n)
+		return;
 
-  int num_Transposition = m / block_size;
+	unsigned int row, column, counter;
 
-  int start_M = 0;
-  int start_N = 0;
-  int counter = 0;
+	bool isMultiple;
 
-  if (isMultiple = false){
-	   int additional_Mtranspose = remainder_M;
-		 int additional_Ntranspose = remainder_N;
-  }
+	unsigned int remainder = n % block_size;
 
-  int row, column = 0;
+	unsigned int iternations = n / block_size;
 
-  while (counter < num_Transposition) {
+	int end_with_remainder = block_size * iternations;
+	unsigned int additional_transpose = remainder;
 
-    // fall under the linear line that does not need to be transposed
-	  for (row = start_N; row < block_size, row++) {
 
-      if (row == start_N && column == start_M){
-			     column++;
-				   break;
-			}
 
-        // we do the following transposition on the next element
-			elif(column < block_size) {
+	// determines if they are multiples each other
+	if (remainder != 0) {
 
-				int tempN;
+		isMultiple = false;
+		printf("Matrix dimensions are not multiples of the block-size but we can still transpose...");
 
-        // we transpose ith and jth element
-				tempN =  A[row*m];
-				AT[row*m] = A[column*n];
-				A[row*n] = temp;
-				j++;
-			}
-
-		}
-		counter++;
 	}
 
-    if((counter == num_Transposition) && (isMultiple == false)){
+	//	Note this works if multiple block sizes
+	while(counter < iternations) {
 
-    // transposition of remainder
-        if (row < m && column < n){
-            tempN = A[row*m];
-            AT[row*m] = A[column*n];
-            A[row*n] = temp;
-        }
-    }
+
+		for (row = 0; row < end_with_remainder; row += block_size) {
+
+			for (column = 0; column < end_with_remainder; column += block_size) {
+
+				//	This is where it starts checking per block size;
+				//	Transpose [row, column] --> [column, row]
+				for (int i = row; i < row + block_size; i++) {
+					for (int j = column; j < column + block_size; j++) {
+						AT[i + j*n] = A[j + i*n];
+					}
+				}
+			}
+
+		counter++;
+
+		}
+	}
+
+	if(counter >= iternations){
+
+		int final_end = end_with_remainder + additional_transpose;
+
+		for (row = end_with_remainder; row < final_end; row++ ) {
+			for (column = end_with_remainder ; column < final_end ; column++ ) {
+				AT[row + column*n] = A[column + row*n];
+			}
+		}
+	}
 
 }
-
 
 bool check_transpose(const int *A, const int *AT, unsigned int m, unsigned int n) {
     unsigned int i, j;
@@ -95,6 +102,7 @@ int main() {
 
     int *A = new int [n * n];
     int *AT = new int [n * n];
+	int size = 45;
 
     std::srand(std::time(nullptr));
     for (unsigned int i = 0 ; i < n*n ; i++) {
@@ -102,7 +110,8 @@ int main() {
     }
 
     auto start = std::chrono::high_resolution_clock::now();
-    transpose(A, n, n, AT);
+    //transpose(A, n, n, AT);
+	transpose_block(A, n, n, size, AT);
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> diff = end - start;
