@@ -6,11 +6,17 @@
 void transpose(const int *A, unsigned int m, unsigned int n, int *AT) {
     unsigned int i, j;
 
+    std::cout << "A[]: " << *A << "\n";
     for (i = 0 ; i < m ; i++ ) {
         for (j = 0 ; j < n ; j++ ) {
             AT[i+j*m] = A[j+i*n];
+            
+				
         }
     }
+    
+    std::cout << "AT[]: " << *AT << "\n";
+    
 }
 
 void transpose_block(const int *A, unsigned int m, unsigned int n, unsigned int block_size, int *AT) {
@@ -38,17 +44,22 @@ void transpose_block(const int *A, unsigned int m, unsigned int n, unsigned int 
 	unsigned int additional_transpose = remainder;
 
 
-
 	// determines if they are multiples each other
 	if (remainder != 0) {
 
+        std::cout << "iternations: " << iternations << "\n";
+        std::cout << "additional_transpose: " << additional_transpose << "\n";
+		std::cout << "end_with_remainder: " << end_with_remainder << "\n";
+		
 		isMultiple = false;
-		printf("Matrix dimensions are not multiples of the block-size but we can still transpose...");
-
+		printf("Matrix dimensions are not multiples of the block-size but we can still transpose...\n");
+        
 	}
 
+    std::cout << "A[]: " << *A << "\n";
+
 	//	Note this works if multiple block sizes
-	while(counter < iternations) {
+	while(row != end_with_remainder) {
 
 
 		for (row = 0; row < end_with_remainder; row += block_size) {
@@ -63,22 +74,25 @@ void transpose_block(const int *A, unsigned int m, unsigned int n, unsigned int 
 					}
 				}
 			}
-
-		counter++;
-
 		}
 	}
-
-	if(counter >= iternations){
-
-		int final_end = end_with_remainder + additional_transpose;
-
-		for (row = end_with_remainder; row < final_end; row++ ) {
-			for (column = end_with_remainder ; column < final_end ; column++ ) {
+	
+	while (row < n){
+	   
+		for (row = end_with_remainder; row < n; row++ ) {
+			for (column = end_with_remainder ; column < n ; column++ ) {
 				AT[row + column*n] = A[column + row*n];
+		
+				
+
 			}
 		}
 	}
+
+        std::cout << "row: " << row << "\n";
+        std::cout << "column: " << column << "\n";
+        std::cout << "AT[]: " << *AT << "\n";
+
 
 }
 
@@ -98,11 +112,11 @@ bool check_transpose(const int *A, const int *AT, unsigned int m, unsigned int n
 
 
 int main() {
-    unsigned int n = 5000;
+    unsigned int n = 500;
 
     int *A = new int [n * n];
     int *AT = new int [n * n];
-	int size = 45;
+	int size = 8;
 
     std::srand(std::time(nullptr));
     for (unsigned int i = 0 ; i < n*n ; i++) {
@@ -110,7 +124,7 @@ int main() {
     }
 
     auto start = std::chrono::high_resolution_clock::now();
-    //transpose(A, n, n, AT);
+    transpose(A, n, n, AT);
 	transpose_block(A, n, n, size, AT);
     auto end = std::chrono::high_resolution_clock::now();
 
