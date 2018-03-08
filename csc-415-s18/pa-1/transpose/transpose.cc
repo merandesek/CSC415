@@ -15,38 +15,65 @@ void transpose(const int *A, unsigned int m, unsigned int n, int *AT) {
 
 void transpose_block(const int *A, unsigned int m, unsigned int n, unsigned int block_size, int *AT) {
 
-    int remainder = m % block_size;
-    int numTransposition = m / block_size;
+	boolean isMultiple;
 
-    if (remainder != 0)
-        additional_transpose = partition;
+  int remainder_M = m % block_size;
+  int remainder_N = n % block_size;
 
-    int start_n = 0;
-    int start_m = 0;
+  if (remainder_M == 0 || remainder_N == 0)
+	isMultiple = false;
 
-    int i, j;
+  int num_Transposition = m / block_size;
 
-    for (int counter = 0; i < numTransposition; counter++) {
+  int start_M = 0;
+  int start_N = 0;
+  int counter = 0;
 
-        for (i = start_n; i < block_size, i++) {
-
-          int tempN = A[i*m];
-
-            if (j < block_size) {
-              AT[i*m] = A[j*n];
-              A[i*n] = temp;
-              j++;
-            }
-
-            if (i == block_size && j == block_size) {
-      i = start_n + 1;
-      j = start_m + 1;
+  if (isMultiple = false){
+	   int additional_Mtranspose = remainder_M;
+		 int additional_Ntranspose = remainder_N;
   }
 
-counter++;
+  int row, column = 0;
+
+  while (counter < num_Transposition) {
+
+    // fall under the linear line that does not need to be transposed
+	  for (row = start_N; row < block_size, row++) {
+
+      if (row == start_N && column == start_M){
+			     column++;
+				   break;
+			}
+
+        // we do the following transposition on the next element
+			elif(column < block_size) {
+
+				int tempN;
+
+        // we transpose ith and jth element
+				tempN =  A[row*m];
+				AT[row*m] = A[column*n];
+				A[row*n] = temp;
+				j++;
+			}
+
+		}
+		counter++;
+	}
+
+    if((counter == num_Transposition) && (isMultiple == false)){
+
+    // transposition of remainder
+        if (row < m && column < n){
+            tempN = A[row*m];
+            AT[row*m] = A[column*n];
+            A[row*n] = temp;
+        }
+    }
 
 }
-}
+
 
 bool check_transpose(const int *A, const int *AT, unsigned int m, unsigned int n) {
     unsigned int i, j;
