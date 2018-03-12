@@ -3,8 +3,8 @@
 
 // input matrix A (row-major order) of dimensions m x n
 // output matrix AT (row-major order) of dimensions n x m
-void transpose(const int *A, unsigned int m, unsigned int n, int *AT) {
-    unsigned int i, j;
+void transpose(const int *A, int m, int n, int *AT) {
+    int i, j;
 
     for (i = 0 ; i < m ; i++ ) {
         for (j = 0 ; j < n ; j++ ) {
@@ -13,7 +13,7 @@ void transpose(const int *A, unsigned int m, unsigned int n, int *AT) {
     }
 }
 
-void transpose_block(const int *A, unsigned int m, unsigned int n, unsigned int block_size, int *AT) {
+void transpose_block(const int *A, int m, int n, int block_size, int *AT) {
 
 	// Note: was referencing http://csapp.cs.cmu.edu/2e/waside/waside-blocking.pdf for understanding of loop cache blocking
 	// PDF "Using Blocking to Increase Temporal Locality"
@@ -23,11 +23,10 @@ void transpose_block(const int *A, unsigned int m, unsigned int n, unsigned int 
 	// Goal: If A is an m × n matrix then AT is an n × m matrix.
 
 	// if the size of the array is not equal we cannot transpose it correctly
-	if (m != n)
-		return;
 
-	unsigned int row, column;
-	unsigned int iternations = n / block_size;
+	int row = 0;
+	int column;
+	int iternations = n / block_size;
 	int end_with_remainder = block_size * iternations;
 
 	//	Note this works if multiple block sizes
@@ -54,8 +53,8 @@ void transpose_block(const int *A, unsigned int m, unsigned int n, unsigned int 
 	}
 }
 
-bool check_transpose(const int *A, const int *AT, unsigned int m, unsigned int n) {
-    unsigned int i, j;
+bool check_transpose(const int *A, const int *AT, int m, int n) {
+    int i, j;
 
     for ( i = 0 ; i < m ; i++ ) {
         for ( j = 0 ; j < n ; j++ ) {
@@ -66,7 +65,7 @@ bool check_transpose(const int *A, const int *AT, unsigned int m, unsigned int n
     return true;
 }
 
-void testTransposeBlock(int n, const int *A, int *AT) {
+void testTransposeBlock(int n, int *A, int *AT) {
 
     int test_case[] = {2, 50, 100, 250, 500, 1000, 2500};
     int size = sizeof(test_case)/sizeof(test_case[0]);
@@ -76,7 +75,7 @@ void testTransposeBlock(int n, const int *A, int *AT) {
         int block_size = test_case[i];
         std::cout << "Block Size: " << block_size << " x " << block_size << "\n";
 
-    	unsigned int remainder = n % block_size;
+    	int remainder = n % block_size;
 
     	// determines if they are multiples each other
     	if (remainder != 0) {
@@ -85,9 +84,9 @@ void testTransposeBlock(int n, const int *A, int *AT) {
 
     	}
 
-        double start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
     	transpose_block(A, n, n, block_size, AT);
-        double end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> diff = end - start;
         std::cout << "Time of Transpose Block: " << diff.count() << " sec\n\n";
 
@@ -107,7 +106,7 @@ int main(int argc, char *argv[]) {
     transpose(A, n, n, AT);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> diff = end - start;
-    std::cout << "Time of Transpose: " << diff.count() << " sec\n\n";
+    std::cout << "Time of `transpose`: " << diff.count() << " sec\n";
 
     testTransposeBlock(n, A, AT);
 
